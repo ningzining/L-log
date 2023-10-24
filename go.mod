@@ -1,4 +1,4 @@
-module L-log
+module github.com/ningzining/L-log
 
 go 1.21.3
 
