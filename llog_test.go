@@ -28,3 +28,9 @@ func TestPanic(t *testing.T) {
 func TestFatal(t *testing.T) {
 	Fatal("hello world", zap.String("name", "cotton"))
 }
+
+func TestSetLevel(t *testing.T) {
+	Info("hello world", zap.String("name", "cotton"))
+	SetLevel(ErrorLevel)
+	Info("hello world", zap.String("name", "cotton"))
+}
