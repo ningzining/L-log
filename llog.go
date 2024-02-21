@@ -1,11 +1,10 @@
 package L_log
 
 import (
+	"fmt"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"io"
-	"os"
-	"time"
 )
 
 type Level = zapcore.Level
@@ -20,89 +19,79 @@ const (
 )
 
 type Logger struct {
-	l  *zap.Logger
-	al *zap.AtomicLevel
+	logs []*zap.Logger
 }
 
-func New(infoOut io.Writer, errOut io.Writer, level Level) *Logger {
-	if infoOut == nil {
-		infoOut = os.Stdout
-	}
-	if errOut == nil {
-		errOut = os.Stderr
-	}
+func New(cnf Config) *Logger {
+	cnf.complete()
+	loggers := cnf.newZapLog()
 
-	al := zap.NewAtomicLevelAt(level)
-	config := zap.NewProductionConfig()
-	config.EncoderConfig.EncodeTime = func(ts time.Time, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString(ts.Format(time.DateTime))
-	}
-
-	infoLevel := zap.LevelEnablerFunc(func(level zapcore.Level) bool {
-		return level <= al.Level()
-	})
-	errorLevel := zap.LevelEnablerFunc(func(level zapcore.Level) bool {
-		return level > al.Level()
-	})
-
-	logger := zap.New(
-		zapcore.NewTee(
-			zapcore.NewCore(
-				zapcore.NewJSONEncoder(config.EncoderConfig),
-				zapcore.AddSync(infoOut),
-				infoLevel,
-			),
-			zapcore.NewCore(
-				zapcore.NewJSONEncoder(config.EncoderConfig),
-				zapcore.AddSync(errOut),
-				errorLevel,
-			),
-		),
-		zap.AddCaller(),
-		zap.AddStacktrace(errorLevel),
-		zap.AddCallerSkip(2),
-	)
-
-	return &Logger{l: logger, al: &al}
-}
-
-func (l *Logger) SetLevel(level Level) {
-	if l.al != nil {
-		l.al.SetLevel(level)
-	}
+	return &Logger{logs: loggers}
 }
 
 type Field = zap.Field
 
 func (l *Logger) Debug(msg string, fields ...Field) {
-	l.l.Debug(msg, fields...)
+	l.output(DebugLevel, msg, fields...)
 }
 
 func (l *Logger) Info(msg string, fields ...Field) {
-	l.l.Info(msg, fields...)
+	l.output(InfoLevel, msg, fields...)
 }
 
 func (l *Logger) Warn(msg string, fields ...Field) {
-	l.l.Warn(msg, fields...)
+	l.output(WarnLevel, msg, fields...)
 }
 
 func (l *Logger) Error(msg string, fields ...Field) {
-	l.l.Error(msg, fields...)
+	l.output(ErrorLevel, msg, fields...)
 }
 
 func (l *Logger) Panic(msg string, fields ...Field) {
-	l.l.Panic(msg, fields...)
+	l.output(PanicLevel, msg, fields...)
 }
 
 func (l *Logger) Fatal(msg string, fields ...Field) {
-	l.l.Fatal(msg, fields...)
+	l.output(FatalLevel, msg, fields...)
 }
 
-func (l *Logger) Sync() error {
-	return l.l.Sync()
+func (l *Logger) Debugf(msg string, a ...any) {
+	l.output(DebugLevel, fmt.Sprintf(msg, a...))
 }
 
-var std = New(os.Stdout, os.Stdout, InfoLevel)
+func (l *Logger) Infof(msg string, a ...any) {
+	l.output(InfoLevel, fmt.Sprintf(msg, a...))
+}
+
+func (l *Logger) Warnf(msg string, a ...any) {
+	l.output(WarnLevel, fmt.Sprintf(msg, a...))
+}
+
+func (l *Logger) Errorf(msg string, a ...any) {
+	l.output(ErrorLevel, fmt.Sprintf(msg, a...))
+}
+
+func (l *Logger) Panicf(msg string, a ...any) {
+	l.output(PanicLevel, fmt.Sprintf(msg, a...))
+}
+
+func (l *Logger) Fatalf(msg string, a ...any) {
+	l.output(FatalLevel, fmt.Sprintf(msg, a...))
+}
+
+func (l *Logger) output(lvl Level, msg string, fields ...Field) {
+	for _, log := range l.logs {
+		log.Log(lvl, msg, fields...)
+	}
+}
+
+func (l *Logger) Sync() {
+	for _, log := range l.logs {
+		_ = log.Sync()
+	}
+}
+
+var std = New(Config{})
 
 func Default() *Logger {
 	return std
@@ -112,34 +101,54 @@ func ReplaceDefault(l *Logger) {
 	std = l
 }
 
-func SetLevel(level Level) {
-	std.SetLevel(level)
-}
-
 func Debug(msg string, fields ...Field) {
 	std.Debug(msg, fields...)
+}
+
+func Debugf(msg string, a ...any) {
+	std.Debugf(msg, a...)
 }
 
 func Info(msg string, fields ...Field) {
 	std.Info(msg, fields...)
 }
 
+func Infof(msg string, a ...any) {
+	std.Infof(msg, a...)
+}
+
 func Warn(msg string, fields ...Field) {
 	std.Warn(msg, fields...)
+}
+
+func Warnf(msg string, a ...any) {
+	std.Warnf(msg, a...)
 }
 
 func Error(msg string, fields ...Field) {
 	std.Error(msg, fields...)
 }
 
+func Errorf(msg string, a ...any) {
+	std.Errorf(msg, a...)
+}
+
 func Panic(msg string, fields ...Field) {
 	std.Panic(msg, fields...)
+}
+
+func Panicf(msg string, a ...any) {
+	std.Panicf(msg, a...)
 }
 
 func Fatal(msg string, fields ...Field) {
 	std.Fatal(msg, fields...)
 }
 
-func Sync() error {
-	return std.Sync()
+func Fatalf(msg string, a ...any) {
+	std.Fatalf(msg, a...)
+}
+
+func Sync() {
+	std.Sync()
 }

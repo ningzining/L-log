@@ -1,16 +1,25 @@
 package L_log
 
 import (
-	"go.uber.org/zap"
 	"testing"
+
+	"go.uber.org/zap"
 )
 
 func TestDebug(t *testing.T) {
 	Debug("hello world", zap.String("name", "cotton"))
 }
 
+func TestDebugf(t *testing.T) {
+	Debugf("hello world: %s", "cotton")
+}
+
 func TestInfo(t *testing.T) {
 	Info("hello world", zap.String("name", "cotton"))
+}
+
+func TestInfof(t *testing.T) {
+	Infof("hello world: %s", "cotton")
 }
 
 func TestWarn(t *testing.T) {
