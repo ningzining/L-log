@@ -1,18 +1,40 @@
 package log
 
 import (
-	"time"
-
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"os"
 )
 
-func buildZapProductionConfig() zap.Config {
-	config := zap.NewProductionConfig()
-	config.EncoderConfig.EncodeTime = func(ts time.Time, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString(ts.Format(time.DateTime))
+func newLogger(opt *options) *zap.Logger {
+	var writer zapcore.WriteSyncer
+	switch opt.stdout {
+	case "file":
+		writer = zapcore.AddSync(NewLumberjackWriter(opt))
+	default:
+		writer = os.Stdout
 	}
-	return config
+
+	var encoder zapcore.Encoder
+	switch opt.format {
+	case "json":
+		encoder = newJsonEncoder()
+	default:
+		encoder = newConsoleEncoder()
+	}
+
+	return zap.New(
+		zapcore.NewTee(
+			zapcore.NewCore(
+				encoder,
+				writer,
+				buildLevelEnablerFunc(zap.NewAtomicLevelAt(opt.Level).Level()),
+			),
+		),
+		zap.AddCaller(),
+		zap.AddCallerSkip(3),
+		zap.AddStacktrace(buildErrorLevelEnablerFunc()),
+	)
 }
 
 func buildErrorLevelEnablerFunc() zap.LevelEnablerFunc {

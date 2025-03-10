@@ -3,13 +3,8 @@ module github.com/ningzining/L-log
 go 1.21.3
 
 require (
-	github.com/natefinch/lumberjack v2.0.0+incompatible
 	go.uber.org/zap v1.26.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
-require (
-	github.com/BurntSushi/toml v1.3.2 // indirect
-	go.uber.org/multierr v1.11.0 // indirect
-	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
-)
+require go.uber.org/multierr v1.11.0 // indirect

@@ -40,6 +40,5 @@ func TestFatal(t *testing.T) {
 
 func TestSetLevel(t *testing.T) {
 	Info("hello world", zap.String("name", "cotton"))
-	SetLevel(ErrorLevel)
 	Info("hello world", zap.String("name", "cotton"))
 }

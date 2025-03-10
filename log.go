@@ -4,29 +4,20 @@ import (
 	"fmt"
 
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-)
-
-type Level = zapcore.Level
-
-const (
-	DebugLevel = zapcore.DebugLevel
-	InfoLevel  = zapcore.InfoLevel
-	WarnLevel  = zapcore.WarnLevel
-	ErrorLevel = zapcore.ErrorLevel
-	PanicLevel = zapcore.PanicLevel
-	FatalLevel = zapcore.FatalLevel
 )
 
 type Logger struct {
-	logs []*zap.Logger
+	log *zap.Logger
 }
 
-func New(cnf Config) *Logger {
-	cnf.complete()
-	loggers := cnf.newZapLog()
+func New(opts ...Option) *Logger {
+	o := newDefault()
+	for _, opt := range opts {
+		opt(o)
+	}
+	logger := newLogger(o)
 
-	return &Logger{logs: loggers}
+	return &Logger{log: logger}
 }
 
 type Field = zap.Field
@@ -80,18 +71,14 @@ func (l *Logger) Fatalf(msg string, a ...any) {
 }
 
 func (l *Logger) output(lvl Level, msg string, fields ...Field) {
-	for _, log := range l.logs {
-		log.Log(lvl, msg, fields...)
-	}
+	l.log.Log(lvl, msg, fields...)
 }
 
 func (l *Logger) Sync() {
-	for _, log := range l.logs {
-		_ = log.Sync()
-	}
+	_ = l.log.Sync()
 }
 
-var std = New(Config{})
+var std = New()
 
 func Default() *Logger {
 	return std
@@ -99,54 +86,6 @@ func Default() *Logger {
 
 func ReplaceDefault(l *Logger) {
 	std = l
-}
-
-func Debug(msg string, fields ...Field) {
-	std.Debug(msg, fields...)
-}
-
-func Debugf(msg string, a ...any) {
-	std.Debugf(msg, a...)
-}
-
-func Info(msg string, fields ...Field) {
-	std.Info(msg, fields...)
-}
-
-func Infof(msg string, a ...any) {
-	std.Infof(msg, a...)
-}
-
-func Warn(msg string, fields ...Field) {
-	std.Warn(msg, fields...)
-}
-
-func Warnf(msg string, a ...any) {
-	std.Warnf(msg, a...)
-}
-
-func Error(msg string, fields ...Field) {
-	std.Error(msg, fields...)
-}
-
-func Errorf(msg string, a ...any) {
-	std.Errorf(msg, a...)
-}
-
-func Panic(msg string, fields ...Field) {
-	std.Panic(msg, fields...)
-}
-
-func Panicf(msg string, a ...any) {
-	std.Panicf(msg, a...)
-}
-
-func Fatal(msg string, fields ...Field) {
-	std.Fatal(msg, fields...)
-}
-
-func Fatalf(msg string, a ...any) {
-	std.Fatalf(msg, a...)
 }
 
 func Sync() {
