@@ -7,17 +7,22 @@ import (
 )
 
 type Logger struct {
-	log *zap.Logger
+	log  *zap.Logger
+	opts *Options
 }
 
 func New(opts ...Option) *Logger {
-	o := newDefault()
+	o := defaultOptions()
 	for _, opt := range opts {
 		opt(o)
 	}
 	logger := newLogger(o)
 
-	return &Logger{log: logger}
+	return &Logger{log: logger, opts: o}
+}
+
+func (l *Logger) Options() *Options {
+	return l.opts
 }
 
 type Field = zap.Field

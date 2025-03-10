@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func NewLumberjackWriter(opt *options) io.Writer {
+func NewLumberjackWriter(opt *Options) io.Writer {
 	return &lumberjack.Logger{
 		Filename:   filepath.Join(opt.path, fmt.Sprintf("%s.log", time.Now().Format(time.DateOnly))),
 		MaxSize:    opt.maxSize,

@@ -6,10 +6,10 @@ import (
 	"os"
 )
 
-func newLogger(opt *options) *zap.Logger {
+func newLogger(opt *Options) *zap.Logger {
 	var writer zapcore.WriteSyncer
 	switch opt.stdout {
-	case "file":
+	case stdoutFile:
 		writer = zapcore.AddSync(NewLumberjackWriter(opt))
 	default:
 		writer = os.Stdout
@@ -17,7 +17,7 @@ func newLogger(opt *options) *zap.Logger {
 
 	var encoder zapcore.Encoder
 	switch opt.format {
-	case "json":
+	case formatJson:
 		encoder = newJsonEncoder()
 	default:
 		encoder = newConsoleEncoder()

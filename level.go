@@ -15,6 +15,11 @@ const (
 	FatalLevel = zapcore.FatalLevel
 )
 
+// Opts 获取logger的全局配置
+func Opts() *Options {
+	return std.opts
+}
+
 func Debug(msg string, fields ...Field) {
 	std.Debug(msg, fields...)
 }
