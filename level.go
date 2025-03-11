@@ -1,18 +1,28 @@
 package log
 
-import (
-	"go.uber.org/zap/zapcore"
-)
+type Level int8
 
-type Level = zapcore.Level
+// LevelForGorm 转换成gorm日志级别
+func (l Level) LevelForGorm() int {
+	switch l {
+	case FatalLevel, ErrorLevel:
+		return 2
+	case WarnLevel:
+		return 3
+	case InfoLevel, DebugLevel:
+		return 4
+	default:
+		return 1
+	}
+}
 
 const (
-	DebugLevel = zapcore.DebugLevel
-	InfoLevel  = zapcore.InfoLevel
-	WarnLevel  = zapcore.WarnLevel
-	ErrorLevel = zapcore.ErrorLevel
-	PanicLevel = zapcore.PanicLevel
-	FatalLevel = zapcore.FatalLevel
+	DebugLevel = iota - 1
+	InfoLevel
+	WarnLevel
+	ErrorLevel
+	PanicLevel
+	FatalLevel
 )
 
 // Opts 获取logger的全局配置

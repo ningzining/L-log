@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"go.uber.org/zap/zapcore"
 
 	"go.uber.org/zap"
 )
@@ -76,7 +77,7 @@ func (l *Logger) Fatalf(msg string, a ...any) {
 }
 
 func (l *Logger) output(lvl Level, msg string, fields ...Field) {
-	l.log.Log(lvl, msg, fields...)
+	l.log.Log(zapcore.Level(lvl), msg, fields...)
 }
 
 func (l *Logger) Sync() {
