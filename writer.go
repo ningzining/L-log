@@ -10,11 +10,11 @@ import (
 
 func NewLumberjackWriter(opt *Options) io.Writer {
 	return &lumberjack.Logger{
-		Filename:   filepath.Join(opt.path, fmt.Sprintf("%s.log", time.Now().Format(time.DateOnly))),
-		MaxSize:    opt.maxSize,
-		MaxAge:     opt.maxAge,
-		MaxBackups: opt.maxBackups,
+		Filename:   filepath.Join(opt.Path, fmt.Sprintf("%s.log", time.Now().Format(time.DateOnly))),
+		MaxSize:    opt.MaxSize,
+		MaxAge:     opt.MaxAge,
+		MaxBackups: opt.MaxBackups,
 		LocalTime:  true,
-		Compress:   opt.compress,
+		Compress:   opt.Compress,
 	}
 }

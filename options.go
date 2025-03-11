@@ -3,40 +3,40 @@ package log
 type Option func(*Options)
 
 const (
-	stdoutDefault = "default" // 终端输出
-	stdoutFile    = "file"    // 文件输出
+	stdout  = "default" // 终端输出
+	fileOut = "file"    // 文件输出
 )
 
 const (
-	formatDefault = "default" // 终端输出
-	formatJson    = "json"    // json格式输出
+	defaultFormat = "default" // 终端输出
+	jsonFormat    = "json"    // json格式输出
 )
 
 const (
-	pathDefault = "temp/logs"
+	defaultPath = "temp/logs"
 )
 
 type Options struct {
 	Level      Level  // 日志级别
-	path       string // 日志文件路径
-	stdout     string // 输出类型，default: 终端输出，file:文本输出
-	maxSize    int    // 日志文件最大大小（MB）
-	maxAge     int    // 日志文件最大保存天数
-	maxBackups int    // 日志文件最大保存个数
-	compress   bool   // 是否压缩日志文件
-	format     string // 日志输出格式，default: 终端输出，json: json格式输出
+	Path       string // 日志文件路径
+	Out        string // 输出类型，default: 终端输出，file:文本输出
+	MaxSize    int    // 日志文件最大大小（MB）
+	MaxAge     int    // 日志文件最大保存天数
+	MaxBackups int    // 日志文件最大保存个数
+	Compress   bool   // 是否压缩日志文件
+	Format     string // 日志输出格式，default: 终端输出，json: json格式输出
 }
 
 func defaultOptions() *Options {
 	return &Options{
 		Level:      DebugLevel,
-		path:       pathDefault,
-		stdout:     stdoutDefault,
-		maxSize:    10,
-		maxAge:     7,
-		maxBackups: 10,
-		compress:   false,
-		format:     formatDefault,
+		Path:       defaultPath,
+		Out:        stdout,
+		MaxSize:    10,
+		MaxAge:     7,
+		MaxBackups: 10,
+		Compress:   false,
+		Format:     defaultFormat,
 	}
 }
 
@@ -48,36 +48,36 @@ func WithLevel(s Level) Option {
 
 func WithPath(s string) Option {
 	return func(o *Options) {
-		o.path = s
+		o.Path = s
 	}
 }
 
-func WithStdout(s string) Option {
+func WithOut(s string) Option {
 	return func(o *Options) {
-		o.stdout = s
+		o.Out = s
 	}
 }
 
 func WithMaxSize(n int) Option {
 	return func(o *Options) {
-		o.maxSize = n
+		o.MaxSize = n
 	}
 }
 
 func WithMaxAge(n int) Option {
 	return func(o *Options) {
-		o.maxAge = n
+		o.MaxAge = n
 	}
 }
 
 func WithMaxBackups(n int) Option {
 	return func(o *Options) {
-		o.maxBackups = n
+		o.MaxBackups = n
 	}
 }
 
 func WithCompress(compress bool) Option {
 	return func(o *Options) {
-		o.compress = compress
+		o.Compress = compress
 	}
 }
