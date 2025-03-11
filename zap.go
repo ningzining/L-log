@@ -50,6 +50,6 @@ func buildZapProductionConfig() zap.Config {
 
 func buildLevelEnabler(lvl Level) zap.LevelEnablerFunc {
 	return func(level zapcore.Level) bool {
-		return level >= lvl
+		return level >= zapcore.Level(lvl)
 	}
 }
